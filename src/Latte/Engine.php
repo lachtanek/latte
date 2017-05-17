@@ -176,8 +176,9 @@ class Engine
 			@mkdir($this->tempDirectory); // @ - directory may already exist
 		}
 
-		$handle = fopen("$file.lock", 'c+');
-		if (!$handle || !flock($handle, LOCK_EX)) {
+		// $handle = fopen("$file.lock", 'c+');
+		// if (!$handle || !flock($handle, LOCK_EX)) {
+		if (!\DirFlock::lock($file, LOCK_EX)) {
 			throw new \RuntimeException("Unable to acquire exclusive lock '$file.lock'.");
 		}
 
@@ -195,9 +196,10 @@ class Engine
 			throw new \RuntimeException("Unable to load '$file'.");
 		}
 
-		flock($handle, LOCK_UN);
-		fclose($handle);
-		@unlink("$file.lock"); // @ file may become locked on Windows
+		\DirFlock::lock($file, LOCK_UN);
+		// flock($handle, LOCK_UN);
+		// fclose($handle);
+		// @unlink("$file.lock"); // @ file may become locked on Windows
 	}
 
 
